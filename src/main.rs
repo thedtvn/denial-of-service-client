@@ -141,7 +141,7 @@ async fn make_req(url: String, auth_token: String) {
                     let current_timestamp: i64 = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .unwrap()
-        .as_secs() as i64;
+        .as_millis() as i64;
                     let data = received.split("\r\n").next().unwrap();
                     if data.starts_with("HTTP") {
                         println!("{} | {}", data, current_timestamp);
@@ -188,7 +188,7 @@ async fn get_proxy() -> Result<Root, &'static str> {
 
 #[tokio::main]
 async fn main() {
-    let ops: [usize; 10000] = core::array::from_fn(|i| i + 1);
+    let ops: [usize; 7000] = core::array::from_fn(|i| i + 1);
     let mut tasks = Vec::with_capacity(ops.len());
     for _i in ops {
         tasks.push(tokio::spawn(make_req("lol".to_string(), "lol".to_string())));
